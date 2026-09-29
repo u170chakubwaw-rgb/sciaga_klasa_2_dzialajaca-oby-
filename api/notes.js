@@ -4,6 +4,7 @@ const database = createClient({
   url: process.env.TURSO_DATABASE_URL,
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
+const appPassword = process.env.APP_PASSWORD;
 
 const firstNotes = [
   [
@@ -67,6 +68,10 @@ module.exports = async function (request, response) {
   }
 
   if (request.method === "POST") {
+    if (!appPassword || request.body.password !== appPassword) {
+      response.status(401).json({ error: "Złe hasło." });
+      return;
+    }
     const title = (request.body.title || "").trim();
     const content = (request.body.content || "").trim();
     if (!title || !content) {

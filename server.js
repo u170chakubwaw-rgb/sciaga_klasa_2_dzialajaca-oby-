@@ -6,6 +6,7 @@ const initSqlJs = require("sql.js");
 const app = express();
 const port = process.env.PORT || 3000;
 const databaseFile = path.join(__dirname, "notatki.db");
+const appPassword = process.env.APP_PASSWORD || "1313!";
 let database;
 
 app.use(express.json());
@@ -118,6 +119,10 @@ app.get("/api/notes", function (request, response) {
 });
 
 app.post("/api/notes", function (request, response) {
+  if (request.body.password !== appPassword) {
+    response.status(401).json({ error: "Złe hasło." });
+    return;
+  }
   const title = (request.body.title || "").trim();
   const category = (request.body.category || "Inne").trim();
   const content = (request.body.content || "").trim();
@@ -145,6 +150,10 @@ app.post("/api/notes", function (request, response) {
 });
 
 app.delete("/api/notes/:id", function (request, response) {
+  if (request.body.password !== appPassword) {
+    response.status(401).json({ error: "Złe hasło." });
+    return;
+  }
   const oldCount = database.exec(
     "SELECT COUNT(*) FROM notes WHERE id = " + Number(request.params.id),
   )[0].values[0][0];

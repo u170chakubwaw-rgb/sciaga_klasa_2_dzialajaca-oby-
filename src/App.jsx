@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 const categories = ["Wszystkie", "Geografia"];
-const password = "1313!";
 
 function App() {
   const [notes, setNotes] = useState([]);
@@ -39,8 +38,8 @@ function App() {
 
   function addNote(event) {
     event.preventDefault();
-    if (prompt("Podaj hasło:") !== password) {
-      alert("Złe hasło.");
+    const enteredPassword = prompt("Podaj hasło:");
+    if (!enteredPassword) {
       return;
     }
     setError("");
@@ -48,10 +47,10 @@ function App() {
     fetch("/api/notes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, password: enteredPassword }),
     }).then(function (response) {
       if (!response.ok) {
-        setError("Uzupełnij tytuł i treść.");
+        setError(response.status === 401 ? "Złe hasło." : "Uzupełnij tytuł i treść.");
         return;
       }
 
@@ -70,13 +69,18 @@ function App() {
 
   function deleteNote(id) {
     if (!confirm("Usunąć tę notatkę?")) return;
-    if (prompt("Podaj hasło:") !== password) {
-      alert("Złe hasło.");
+    const enteredPassword = prompt("Podaj hasło:");
+    if (!enteredPassword) {
       return;
     }
 
-    fetch("/api/notes/" + id, { method: "DELETE" }).then(function () {
-      getNotes();
+    fetch("/api/notes/" + id, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: enteredPassword }),
+    }).then(function (response) {
+      if (response.ok) getNotes();
+      else alert("Złe hasło.");
     });
   }
 
