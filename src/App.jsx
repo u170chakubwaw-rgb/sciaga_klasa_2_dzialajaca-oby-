@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 const categories = ["Wszystkie", "Geografia"];
+const password = "1313!";
 
 function App() {
   const [notes, setNotes] = useState([]);
@@ -38,6 +39,10 @@ function App() {
 
   function addNote(event) {
     event.preventDefault();
+    if (prompt("Podaj hasło:") !== password) {
+      alert("Złe hasło.");
+      return;
+    }
     setError("");
 
     fetch("/api/notes", {
@@ -65,6 +70,10 @@ function App() {
 
   function deleteNote(id) {
     if (!confirm("Usunąć tę notatkę?")) return;
+    if (prompt("Podaj hasło:") !== password) {
+      alert("Złe hasło.");
+      return;
+    }
 
     fetch("/api/notes/" + id, { method: "DELETE" }).then(function () {
       getNotes();

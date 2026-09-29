@@ -11,6 +11,9 @@ module.exports = async function (request, response) {
     return;
   }
 
-  await database.execute({ sql: "DELETE FROM notes WHERE id = ?", args: [request.query.id] });
+  await database.execute({
+    sql: "DELETE FROM notes WHERE id = ?",
+    args: [request.query.id],
+  });
   response.json({ message: "Notatka usunięta." });
 };
